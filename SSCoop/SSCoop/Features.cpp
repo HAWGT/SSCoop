@@ -21,8 +21,6 @@ void HookGame()
 
 		Orig_AActor_ProcessEvent = reinterpret_cast<AActor_ProcessEvent_t>(TrampHook64(PatternScan("48 89 5C 24 10 48 89 6C 24 18 57 48 83 EC ? F7 82 B0 00 00 00 ? ? ? ?"), (BYTE*)hk_AActor_ProcessEvent, 15));
 
-		Orig_UWorld_SpawnActor = reinterpret_cast<UWorld_SpawnActor_t>(PatternScan("40 55 53 56 57 41 54 41 55 41 56 41 57 48 8D AC 24 08 FF FF FF 48 81 EC ? ? ? ? 48 8B 05 ? ? ? ? 48 33 C4 48 89 45 40"));
-
 		BYTE ForceListenPatch[] = { 0x90, 0x90 };
 
 		BYTE* ListenOptionCheck = PatternScan("74 ? 49 8B 8D 80 02 00 00 49 8B D7");
@@ -117,6 +115,32 @@ void hk_UGameViewportClient_PostRender(SDK::UGameViewportClient Instance, SDK::U
 
 void __fastcall hk_AActor_ProcessEvent(SDK::AActor* Class, SDK::UFunction* Function, void* Parms)
 {
+	if (Class == MainHacker)
+	{
+		/*
+		* After a client joins, these events occur on the local player controller:
+K2_OnBecomeViewTarget
+ReceiveUnPossess
+ReceivePossessed
+ServerAcknowledgePossession
+K2_OnMovementModeChanged
+K2_OnEndViewTarget
+K2_OnBecomeViewTarget
+ClientRestart
+ReceivePossess
+ReceiveBeginPlay
+K2_OnBecomeViewTarget
+ReceiveUnPossess
+		*/
+
+		if (!Function->GetName().compare("ReceiveUnPossess"))
+			return;
+		if (!Function->GetName().compare("ReceivePossess") && MainHacker->Pawn->IsA(SDK::APAWN_Hacker_Implant_C::StaticClass()))
+			return;
+		if (!Function->GetName().compare("ClientRestart") && MainHacker->Pawn->IsA(SDK::APAWN_Hacker_Implant_C::StaticClass()))
+			return;
+	}
+
 	Orig_AActor_ProcessEvent(Class, Function, Parms);
 
 	if (Class->IsA(SDK::AGM_SinglePlayer_C::StaticClass()) && !Function->GetName().compare("K2_PostLogin"))
@@ -164,6 +188,26 @@ void __fastcall hk_AActor_ProcessEvent(SDK::AActor* Class, SDK::UFunction* Funct
 			PossessRandomPawn(Hacker);
 		}
 	}
+
+	/*
+
+	if (Class->IsA(SDK::ACON_Hacker_C::StaticClass()))
+	{
+		auto Hacker = static_cast<SDK::ACON_Hacker_C*>(Class);
+		if (Hacker->bIsLocalPlayerController)
+		{
+			std::cout << Function->GetName() << "\n";
+		}
+	}
+
+	if (Class->IsA(SDK::APAWN_Hacker_Implant_C::StaticClass()) || Class->IsA(SDK::APAWN_PlayerGhost_C::StaticClass()))
+	{
+		auto Pawn = static_cast<SDK::APawn*>(Class);
+		if (Pawn->Controller && static_cast<SDK::ACON_Hacker_C*>(Pawn->Controller)->bIsLocalPlayerController)
+		{
+			std::cout << Function->GetName() << "\n";
+		}
+	}*/
 }
 
 void __fastcall hk_UGameplayStatics_OpenLevel(const SDK::UObject* WorldContextObject, SDK::FName LevelName, bool bAbsolute, SDK::FString Options)
