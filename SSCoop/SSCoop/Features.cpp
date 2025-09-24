@@ -33,7 +33,7 @@ void HookGame()
 
 		bHooked = true;
 
-		
+
 		/*
 
 		for (int i = 0; i < SDK::UObject::GObjects->Num(); i++)
@@ -133,12 +133,28 @@ K2_OnBecomeViewTarget
 ReceiveUnPossess
 		*/
 
-		if (!Function->GetName().compare("ReceiveUnPossess"))
-			return;
-		if (!Function->GetName().compare("ReceivePossess") && MainHacker->Pawn->IsA(SDK::APAWN_Hacker_Implant_C::StaticClass()))
-			return;
-		if (!Function->GetName().compare("ClientRestart") && MainHacker->Pawn->IsA(SDK::APAWN_Hacker_Implant_C::StaticClass()))
-			return;
+
+		//TODO: Find another way, perhaps by hijacking the possess through the vtable as tramp hooking causes a crash
+		if (!Function->GetName().compare("ReceiveTick"))
+		{
+			if (MainHacker->Pawn == nullptr)
+			{
+				auto World = SDK::UWorld::GetWorld();
+				auto Level = World->PersistentLevel;
+				SDK::TArray<SDK::AActor*>& Actors = Level->Actors;
+
+				for (const auto& Actor : Actors)
+				{
+					if (Actor->IsA(SDK::APAWN_Hacker_Implant_C::StaticClass()))
+					{
+						if (static_cast<SDK::APAWN_Hacker_Implant_C*>(Actor)->Controller == nullptr)
+						{
+							MainHacker->Possess(static_cast<SDK::APAWN_Hacker_Implant_C*>(Actor));
+						}
+					}
+				}
+			}
+		}
 	}
 
 	Orig_AActor_ProcessEvent(Class, Function, Parms);
