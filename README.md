@@ -11,4 +11,4 @@ Compile the dll, rename it to umpdc.dll and place it inside the Win64 folder, th
 
 Run the game (first instance will be the listen server) and head to the first level.
 
-To connect, you must run another instance and inject Universal Unreal Unlocker 4, open the console and type "open <ip>" (<ip> is the listen server ip address)
+To connect, you must run another instance and inject Universal Unreal Unlocker 4, open the console and type "open ip" (ip is the listen server ip address)
