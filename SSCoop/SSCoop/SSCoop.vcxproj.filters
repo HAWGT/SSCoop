@@ -50,5 +50,8 @@
     <ClCompile Include="CppSDK\SDK\Engine_functions.cpp">
       <Filter>MoreFiles</Filter>
     </ClCompile>
+    <ClCompile Include="CppSDK\SDK\CON_Hacker_functions.cpp">
+      <Filter>MoreFiles</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

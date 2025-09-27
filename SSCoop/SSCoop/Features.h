@@ -18,6 +18,8 @@ inline SDK::ACON_Hacker_C* MainHacker;
 void HookGame();
 void MainLoop();
 
+void ReplicateAll();
+
 void SpawnNewPlayer(SDK::ACON_Hacker_C* Hacker);
 void PossessRandomPawn(SDK::ACON_Hacker_C* Hacker);
 

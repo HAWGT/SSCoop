@@ -142,6 +142,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="CppSDK\SDK\Basic.cpp" />
+    <ClCompile Include="CppSDK\SDK\CON_Hacker_functions.cpp" />
     <ClCompile Include="CppSDK\SDK\CoreGame_functions.cpp" />
     <ClCompile Include="CppSDK\SDK\CoreUObject_functions.cpp" />
     <ClCompile Include="CppSDK\SDK\Engine_functions.cpp" />

@@ -63,6 +63,19 @@ void MainLoop()
 {
 }
 
+void ReplicateAll()
+{
+	auto World = SDK::UWorld::GetWorld();
+	auto Level = World->PersistentLevel;
+	SDK::TArray<SDK::AActor*>& Actors = Level->Actors;
+
+	for (const auto& Actor : Actors)
+	{
+		Actor->SetReplicates(true);
+		Actor->SetReplicateMovement(true);
+	}
+}
+
 void SpawnNewPlayer(SDK::ACON_Hacker_C* Hacker)
 {
 	std::cout << "SpawnNewPlayer" << "\n";
@@ -151,6 +164,10 @@ ReceiveUnPossess
 						{
 							MainHacker->Possess(static_cast<SDK::APAWN_Hacker_Implant_C*>(Actor));
 						}
+						else
+						{
+							Actor->K2_TeleportTo(MainHacker->Pawn->K2_GetActorLocation(), MainHacker->Pawn->K2_GetActorRotation());
+						}
 					}
 				}
 			}
@@ -173,15 +190,7 @@ ReceiveUnPossess
 		{
 			MainHacker = Hacker;
 
-			auto World = SDK::UWorld::GetWorld();
-			auto Level = World->PersistentLevel;
-			SDK::TArray<SDK::AActor*>& Actors = Level->Actors;
-
-			for (const auto& Actor : Actors)
-			{
-				Actor->SetReplicates(true);
-				Actor->SetReplicateMovement(true);
-			}
+			ReplicateAll();
 		}
 	}
 
@@ -203,6 +212,11 @@ ReceiveUnPossess
 		{
 			PossessRandomPawn(Hacker);
 		}
+	}
+
+	if (!Function->GetName().compare("SpawnActorInLevel") || !Function->GetName().compare("SpawnActorInLevelWithName") || !Function->GetName().compare("SpawnActorInWorld"))
+	{
+		ReplicateAll();
 	}
 
 	/*
